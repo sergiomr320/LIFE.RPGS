@@ -1,0 +1,19 @@
+{
+  "name": "LIFE RPG",
+  "short_name": "LIFE RPG",
+  "description": "Your life. Your quest. Your enemy.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

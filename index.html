@@ -1,0 +1,6114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+>
+
+<meta
+    name="theme-color"
+    content="#050505"
+>
+
+<meta
+    name="description"
+    content="Your life. Your quest. Your enemy."
+>
+
+<link rel="manifest" href="./manifest.json">
+
+<title>LIFE RPG</title>
+
+<style>
+
+/* =========================================================
+   RESET
+========================================================= */
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    background:#050505;
+    color:#f5f5f5;
+    font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+}
+
+button,
+input,
+textarea,
+select{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.hidden{
+    display:none !important;
+}
+
+
+/* =========================================================
+   INTRO
+========================================================= */
+
+#intro{
+    position:fixed;
+    inset:0;
+    z-index:99999;
+    background:#000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+}
+
+.intro-ring{
+    position:absolute;
+    width:260px;
+    height:260px;
+    border:2px solid transparent;
+    border-radius:50%;
+    opacity:0;
+    box-shadow:
+        0 0 20px rgba(255,48,48,.4),
+        0 0 60px rgba(255,48,48,.2);
+    animation:ringAssemble 3.5s ease forwards;
+}
+
+.intro-ring::before,
+.intro-ring::after{
+    content:"";
+    position:absolute;
+    inset:-12px;
+    border-radius:50%;
+    border:1px solid rgba(255,48,48,.18);
+}
+
+.intro-ring::after{
+    inset:12px;
+    border-color:rgba(255,170,0,.12);
+}
+
+.intro-particles{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+}
+
+.intro-particle{
+    position:absolute;
+    width:3px;
+    height:45px;
+    background:linear-gradient(
+        to bottom,
+        transparent,
+        #ff3030,
+        transparent
+    );
+    opacity:0;
+    transform-origin:center;
+    animation:particleFly 2.7s ease forwards;
+}
+
+.intro-title{
+    position:relative;
+    z-index:5;
+    text-align:center;
+    opacity:0;
+    transform:scale(.8);
+    animation:introTitle 1.7s ease 3.1s forwards;
+}
+
+.intro-title h1{
+    font-size:clamp(35px,7vw,90px);
+    letter-spacing:8px;
+    font-weight:900;
+    color:#fff;
+    text-shadow:
+        0 0 10px rgba(255,255,255,.6),
+        0 0 30px rgba(255,48,48,.5),
+        0 0 70px rgba(255,48,48,.25);
+}
+
+.intro-title p{
+    margin-top:18px;
+    font-size:12px;
+    letter-spacing:5px;
+    color:#777;
+}
+
+@keyframes particleFly{
+    0%{
+        opacity:0;
+        transform:
+            translate(
+                var(--x),
+                var(--y)
+            )
+            rotate(var(--r))
+            scale(.2);
+    }
+
+    40%{
+        opacity:1;
+    }
+
+    100%{
+        opacity:.9;
+        transform:
+            translate(0,0)
+            rotate(var(--r))
+            scale(1);
+    }
+}
+
+@keyframes ringAssemble{
+    0%{
+        opacity:0;
+        transform:rotate(-180deg) scale(.2);
+        border-color:transparent;
+    }
+
+    45%{
+        opacity:1;
+        border-color:#ff3030;
+    }
+
+    80%{
+        transform:rotate(0deg) scale(1.05);
+    }
+
+    100%{
+        opacity:1;
+        transform:rotate(0deg) scale(1);
+        border-color:#ff3030;
+        box-shadow:
+            0 0 25px rgba(255,48,48,.7),
+            0 0 80px rgba(255,48,48,.25);
+    }
+}
+
+@keyframes introTitle{
+    0%{
+        opacity:0;
+        transform:scale(.7);
+        letter-spacing:30px;
+    }
+
+    100%{
+        opacity:1;
+        transform:scale(1);
+        letter-spacing:8px;
+    }
+}
+
+.intro-hide{
+    animation:introExit .8s ease forwards;
+}
+
+@keyframes introExit{
+    to{
+        opacity:0;
+        visibility:hidden;
+    }
+}
+
+
+/* =========================================================
+   APP
+========================================================= */
+
+#app{
+    display:none;
+    min-height:100vh;
+}
+
+#app.active{
+    display:block;
+}
+
+
+/* =========================================================
+   TOPBAR
+========================================================= */
+
+.topbar{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    height:70px;
+    z-index:1000;
+    background:rgba(5,5,5,.9);
+    backdrop-filter:blur(18px);
+    border-bottom:1px solid rgba(255,255,255,.06);
+    display:flex;
+    align-items:center;
+    padding:0 25px;
+}
+
+.logo{
+    font-size:22px;
+    font-weight:1000;
+    letter-spacing:3px;
+    color:#fff;
+}
+
+.logo span{
+    color:#ff3030;
+    text-shadow:0 0 15px rgba(255,48,48,.5);
+}
+
+.menu-button{
+    display:none;
+    margin-left:auto;
+    width:42px;
+    height:42px;
+    border:1px solid rgba(255,255,255,.1);
+    background:#0d0d0d;
+    color:white;
+    border-radius:8px;
+    font-size:22px;
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar{
+    position:fixed;
+    top:70px;
+    left:0;
+    bottom:0;
+    width:230px;
+    background:#080808;
+    border-right:1px solid rgba(255,255,255,.06);
+    padding:25px 15px;
+    z-index:900;
+    overflow-y:auto;
+}
+
+.nav-title{
+    color:#444;
+    font-size:10px;
+    letter-spacing:3px;
+    font-weight:800;
+    padding:0 12px;
+    margin-bottom:12px;
+}
+
+.nav-button{
+    width:100%;
+    padding:13px 12px;
+    margin-bottom:5px;
+    background:transparent;
+    border:1px solid transparent;
+    color:#777;
+    border-radius:8px;
+    text-align:left;
+    font-weight:700;
+    transition:.2s;
+}
+
+.nav-button:hover{
+    color:#fff;
+    background:#101010;
+}
+
+.nav-button.active{
+    color:#fff;
+    background:
+        linear-gradient(
+            90deg,
+            rgba(255,48,48,.12),
+            transparent
+        );
+    border-color:rgba(255,48,48,.15);
+}
+
+.nav-button.active::before{
+    content:"";
+    display:inline-block;
+    width:4px;
+    height:18px;
+    background:#ff3030;
+    border-radius:5px;
+    vertical-align:middle;
+    margin-right:10px;
+    box-shadow:0 0 10px #ff3030;
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.main{
+    margin-left:230px;
+    padding-top:70px;
+    min-height:100vh;
+}
+
+.page{
+    display:none;
+    padding:35px;
+    max-width:1500px;
+    margin:auto;
+}
+
+.page.active{
+    display:block;
+}
+
+.page-header{
+    margin-bottom:28px;
+}
+
+.page-header h1{
+    font-size:34px;
+    font-weight:950;
+    letter-spacing:-1px;
+}
+
+.page-header p{
+    color:#666;
+    margin-top:6px;
+}
+
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+.card{
+    background:
+        linear-gradient(
+            145deg,
+            #111,
+            #090909
+        );
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:14px;
+    padding:22px;
+    box-shadow:
+        0 10px 40px rgba(0,0,0,.25);
+}
+
+.card h2,
+.card h3{
+    font-weight:900;
+}
+
+.grid{
+    display:grid;
+    gap:20px;
+}
+
+.grid-2{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+}
+
+.grid-3{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+.grid-4{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+}
+
+
+/* =========================================================
+   STAT / PROGRESS
+========================================================= */
+
+.progress-track{
+    width:100%;
+    height:8px;
+    background:#181818;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.progress-fill{
+    height:100%;
+    background:linear-gradient(
+        90deg,
+        #ff3030,
+        #ff8a00
+    );
+    box-shadow:0 0 12px rgba(255,48,48,.5);
+    transition:.3s;
+}
+
+.progress-large{
+    height:12px;
+}
+
+
+/* =========================================================
+   QUESTS
+========================================================= */
+
+.quest-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.quest{
+    background:#0d0d0d;
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:10px;
+    padding:15px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    transition:.2s;
+}
+
+.quest:hover{
+    border-color:rgba(255,48,48,.2);
+}
+
+.quest.completed{
+    opacity:.5;
+}
+
+.quest-checkbox{
+    width:22px;
+    height:22px;
+    min-width:22px;
+    border-radius:5px;
+    border:1px solid #444;
+    background:#080808;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:white;
+    cursor:pointer;
+}
+
+.quest.completed .quest-checkbox{
+    background:#ff3030;
+    border-color:#ff3030;
+    box-shadow:0 0 12px rgba(255,48,48,.4);
+}
+
+.quest-info{
+    flex:1;
+}
+
+.quest-name{
+    font-weight:800;
+}
+
+.quest-description{
+    color:#666;
+    font-size:12px;
+    margin-top:4px;
+}
+
+.quest-xp{
+    color:#ff4b4b;
+    font-weight:900;
+    font-size:13px;
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.btn{
+    border:1px solid rgba(255,255,255,.1);
+    background:#111;
+    color:white;
+    border-radius:8px;
+    padding:10px 15px;
+    font-weight:800;
+    transition:.2s;
+}
+
+.btn:hover{
+    border-color:#ff3030;
+    box-shadow:0 0 15px rgba(255,48,48,.15);
+}
+
+.btn-primary{
+    background:#ff3030;
+    border-color:#ff3030;
+    color:white;
+}
+
+.btn-primary:hover{
+    background:#ff4444;
+    box-shadow:0 0 20px rgba(255,48,48,.3);
+}
+
+.btn-danger{
+    background:#180707;
+    color:#ff5555;
+    border-color:#401010;
+}
+
+
+/* =========================================================
+   INPUTS
+========================================================= */
+
+.input,
+.textarea,
+.select{
+    width:100%;
+    background:#080808;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:8px;
+    padding:12px;
+    outline:none;
+}
+
+.input:focus,
+.textarea:focus,
+.select:focus{
+    border-color:#ff3030;
+    box-shadow:0 0 15px rgba(255,48,48,.1);
+}
+
+.textarea{
+    min-height:100px;
+    resize:vertical;
+}
+
+
+/* =========================================================
+   BADGES
+========================================================= */
+
+.badge{
+    display:inline-flex;
+    align-items:center;
+    padding:5px 9px;
+    border-radius:20px;
+    background:#151515;
+    color:#777;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1px;
+}
+
+.badge-red{
+    color:#ff5555;
+    background:rgba(255,48,48,.08);
+    border:1px solid rgba(255,48,48,.15);
+}
+
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+.hero{
+    background:
+        radial-gradient(
+            circle at 80% 20%,
+            rgba(255,48,48,.12),
+            transparent 35%
+        ),
+        linear-gradient(
+            145deg,
+            #121212,
+            #070707
+        );
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:18px;
+    padding:30px;
+    margin-bottom:20px;
+}
+
+.hero h2{
+    font-size:34px;
+    font-weight:950;
+}
+
+.hero p{
+    color:#666;
+    margin-top:8px;
+}
+
+.dashboard-number{
+    font-size:42px;
+    font-weight:1000;
+    margin-top:10px;
+}
+
+.dashboard-label{
+    color:#666;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:2px;
+}
+
+
+/* =========================================================
+   CHARACTER
+========================================================= */
+
+.character-avatar{
+    width:140px;
+    height:140px;
+    margin:0 auto 20px;
+    border-radius:50%;
+    border:2px solid rgba(255,48,48,.3);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:50px;
+    box-shadow:0 0 35px rgba(255,48,48,.12);
+}
+
+.character-rank{
+    text-align:center;
+    color:#ff4545;
+    font-size:13px;
+    letter-spacing:2px;
+    font-weight:900;
+    margin-top:7px;
+}
+
+.character-rank-label{
+    text-align:center;
+    color:#555;
+    font-size:10px;
+    letter-spacing:2px;
+    margin-top:3px;
+}
+
+.character-stat{
+    background:#0d0d0d;
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:10px;
+    padding:14px;
+}
+
+.character-stat-top{
+    display:flex;
+    justify-content:space-between;
+    gap:15px;
+    align-items:center;
+    margin-bottom:9px;
+}
+
+.character-stat-name{
+    font-weight:850;
+}
+
+.character-stat-value{
+    font-size:12px;
+    color:#ff5555;
+    font-weight:900;
+}
+
+.character-stat-progress-text{
+    font-size:10px;
+    color:#555;
+    margin-top:6px;
+}
+
+
+/* =========================================================
+   RANKS
+========================================================= */
+
+.rank-card{
+    position:relative;
+    overflow:hidden;
+}
+
+.rank-card.current{
+    border-color:rgba(255,48,48,.45);
+    box-shadow:0 0 30px rgba(255,48,48,.08);
+}
+
+.rank-number{
+    color:#555;
+    font-size:11px;
+    letter-spacing:2px;
+}
+
+.rank-name{
+    font-size:23px;
+    font-weight:950;
+    margin:7px 0;
+}
+
+.rank-xp{
+    color:#666;
+    font-size:12px;
+}
+
+.rank-status{
+    margin-top:15px;
+}
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+.stat-card{
+    min-height:150px;
+}
+
+.stat-card.locked{
+    opacity:.55;
+}
+
+.stat-level{
+    font-size:28px;
+    font-weight:950;
+    margin:10px 0;
+}
+
+.stat-name{
+    font-weight:900;
+}
+
+
+/* =========================================================
+   ACHIEVEMENTS
+========================================================= */
+
+.achievement{
+    min-height:150px;
+}
+
+.achievement.hidden-achievement{
+    opacity:.55;
+}
+
+.achievement-icon{
+    width:42px;
+    height:42px;
+    border-radius:10px;
+    background:#151515;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-bottom:12px;
+}
+
+.achievement-title{
+    font-weight:900;
+}
+
+.achievement-description{
+    color:#666;
+    font-size:12px;
+    margin-top:5px;
+    line-height:1.5;
+}
+
+.achievement-meta{
+    margin-top:12px;
+    font-size:10px;
+    color:#555;
+}
+
+
+/* =========================================================
+   BOSS
+========================================================= */
+
+.boss-card{
+    background:
+        radial-gradient(
+            circle at 90% 10%,
+            rgba(255,48,48,.15),
+            transparent 35%
+        ),
+        #0b0b0b;
+}
+
+.boss-name{
+    font-size:30px;
+    font-weight:1000;
+    letter-spacing:2px;
+}
+
+.boss-phase{
+    color:#ff5555;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:2px;
+    margin-top:5px;
+}
+
+.boss-hp{
+    margin-top:20px;
+}
+
+
+/* =========================================================
+   SCHOOL ROUTINE
+========================================================= */
+
+.routine-online{
+    border-color:rgba(80,255,120,.2);
+}
+
+.routine-offline{
+    border-color:rgba(255,170,0,.25);
+}
+
+.status-online{
+    color:#66ff88;
+}
+
+.status-offline{
+    color:#ffad3d;
+}
+
+.countdown{
+    font-size:35px;
+    font-weight:950;
+    letter-spacing:2px;
+    margin-top:10px;
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.modal{
+    position:fixed;
+    inset:0;
+    z-index:5000;
+    background:rgba(0,0,0,.75);
+    backdrop-filter:blur(10px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.modal.open{
+    display:flex;
+}
+
+.modal-box{
+    width:min(550px,100%);
+    background:#0d0d0d;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:15px;
+    padding:25px;
+    box-shadow:0 20px 80px rgba(0,0,0,.7);
+}
+
+.modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.modal-close{
+    background:none;
+    border:none;
+    color:#777;
+    font-size:22px;
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+#toast-container{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    z-index:9000;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.toast{
+    background:#111;
+    border:1px solid rgba(255,48,48,.25);
+    padding:13px 16px;
+    border-radius:8px;
+    box-shadow:0 10px 30px rgba(0,0,0,.4);
+    animation:toastIn .25s ease;
+}
+
+@keyframes toastIn{
+    from{
+        transform:translateY(15px);
+        opacity:0;
+    }
+
+    to{
+        transform:translateY(0);
+        opacity:1;
+    }
+}
+
+
+/* =========================================================
+   FINAL
+========================================================= */
+
+.final-card{
+    text-align:center;
+    padding:60px 30px;
+    border-color:rgba(255,48,48,.2);
+}
+
+.final-card h1{
+    font-size:42px;
+    font-weight:1000;
+    margin-bottom:20px;
+}
+
+.final-message{
+    color:#aaa;
+    font-size:17px;
+    line-height:1.8;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:1000px){
+
+    .grid-4{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+
+}
+
+@media(max-width:800px){
+
+    .sidebar{
+        transform:translateX(-100%);
+        transition:.25s;
+        width:250px;
+    }
+
+    .sidebar.mobile-open{
+        transform:translateX(0);
+    }
+
+    .main{
+        margin-left:0;
+    }
+
+    .menu-button{
+        display:block;
+    }
+
+    .grid-2,
+    .grid-3{
+        grid-template-columns:1fr;
+    }
+
+    .page{
+        padding:25px 18px;
+    }
+
+}
+
+@media(max-width:500px){
+
+    .grid-4{
+        grid-template-columns:1fr;
+    }
+
+    .topbar{
+        padding:0 15px;
+    }
+
+    .hero h2{
+        font-size:27px;
+    }
+
+    .page-header h1{
+        font-size:28px;
+    }
+
+}
+
+
+/* =========================================================
+   UNLOCKED STAT CHARACTER GRID
+========================================================= */
+
+#characterStatsContainer{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+}
+
+.character-no-stats{
+    grid-column:1/-1;
+    padding:25px;
+    text-align:center;
+    background:#0b0b0b;
+    border:1px dashed #252525;
+    border-radius:10px;
+    color:#555;
+}
+
+@media(max-width:650px){
+
+    #characterStatsContainer{
+        grid-template-columns:1fr;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<!-- =====================================================
+     INTRO
+===================================================== -->
+
+<div id="intro">
+
+    <div class="intro-particles" id="introParticles"></div>
+
+    <div class="intro-ring"></div>
+
+    <div class="intro-title">
+
+        <h1>YOU AGAINST YOU</h1>
+
+        <p>
+            YOUR LIFE • YOUR QUEST • YOUR ENEMY
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     APP
+===================================================== -->
+
+<div id="app">
+
+
+    <!-- =================================================
+         TOPBAR
+    ================================================= -->
+
+    <header class="topbar">
+
+        <div class="logo">
+            LIFE <span>RPG</span>
+        </div>
+
+        <button
+            class="menu-button"
+            id="menuButton"
+            onclick="toggleMobileMenu()"
+        >
+            ☰
+        </button>
+
+    </header>
+
+
+    <!-- =================================================
+         SIDEBAR
+    ================================================= -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="nav-title">
+            MAIN
+        </div>
+
+        <button
+            class="nav-button active"
+            data-page="dashboard"
+            onclick="showPage('dashboard')"
+        >
+            Dashboard
+        </button>
+
+        <button
+            class="nav-button"
+            data-page="character"
+            onclick="showPage('character')"
+        >
+            Character
+        </button>
+
+        <button
+            class="nav-button"
+            data-page="daily"
+            onclick="showPage('daily')"
+        >
+            Daily Quests
+        </button>
+
+        <button
+            class="nav-button"
+            data-page="weekly"
+            onclick="showPage('weekly')"
+        >
+            Weekly
+        </button>
+
+        <button
+            class="nav-button"
+            data-page="monthly"
+            onclick="showPage('monthly')"
+        >
+            Monthly
+        </button>
+
+        <button
+            class="nav-button"
+            data-page="custom"
+            onclick="showPage('custom')"
+        >
+            Custom Quests
+        </button>
+
+
+        <div
+            class="nav-title"
+            style="margin-top:25px;"
+        >
+            PROGRESSION
+        </div>
+
+        <button
+            class="nav-button"
+            data-page="ranks"
+            onclick="showPage('ranks')"
+        >
+            Ranks
+        </button>
+
+        <button
+            class="nav-button"
+            data-page="stats"
+            onclick="showPage('stats')"
+        >
+            Stats
+        </button>
+
+        <button
+            class="nav-button"
+            data-page="achievements"
+            onclick="showPage('achievements')"
+        >
+            Achievements
+        </button>
+
+        <button
+            class="nav-button"
+            data-page="bosses"
+            onclick="showPage('bosses')"
+        >
+            Bosses
+        </button>
+
+
+        <div
+            class="nav-title"
+            style="margin-top:25px;"
+        >
+            LIFE
+        </div>
+
+        <button
+            class="nav-button"
+            data-page="school"
+            onclick="showPage('school')"
+        >
+            School Routine
+        </button>
+
+        <button
+            class="nav-button"
+            data-page="profile"
+            onclick="showPage('profile')"
+        >
+            Profile
+        </button>
+
+    </aside>
+
+
+    <!-- =================================================
+         MAIN
+    ================================================= -->
+
+    <main class="main">
+
+
+        <!-- =================================================
+             DASHBOARD
+        ================================================= -->
+
+        <section
+            class="page active"
+            id="page-dashboard"
+        >
+
+            <div class="page-header">
+
+                <h1>Dashboard</h1>
+
+                <p>
+                    Your life. Your quest. Your enemy.
+                </p>
+
+            </div>
+
+
+            <div class="hero">
+
+                <h2 id="dashboardGreeting">
+                    Welcome, PLAYER.
+                </h2>
+
+                <p>
+                    Every day is another opportunity
+                    to level up.
+                </p>
+
+                <div
+                    style="
+                    margin-top:25px;
+                    max-width:600px;
+                    "
+                >
+
+                    <div
+                        style="
+                        display:flex;
+                        justify-content:space-between;
+                        margin-bottom:7px;
+                        font-size:11px;
+                        color:#666;
+                        "
+                    >
+
+                        <span>
+                            LEVEL PROGRESS
+                        </span>
+
+                        <span id="dashboardXPText">
+                            0 XP
+                        </span>
+
+                    </div>
+
+                    <div class="progress-track progress-large">
+
+                        <div
+                            class="progress-fill"
+                            id="dashboardXPBar"
+                            style="width:0%"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="grid grid-4">
+
+                <div class="card">
+
+                    <div class="dashboard-label">
+                        Level
+                    </div>
+
+                    <div
+                        class="dashboard-number"
+                        id="dashboardLevel"
+                    >
+                        1
+                    </div>
+
+                </div>
+
+                <div class="card">
+
+                    <div class="dashboard-label">
+                        Rank
+                    </div>
+
+                    <div
+                        class="dashboard-number"
+                        id="dashboardRank"
+                        style="font-size:25px;"
+                    >
+                        BRONZE
+                    </div>
+
+                </div>
+
+                <div class="card">
+
+                    <div class="dashboard-label">
+                        Total XP
+                    </div>
+
+                    <div
+                        class="dashboard-number"
+                        id="dashboardTotalXP"
+                    >
+                        0
+                    </div>
+
+                </div>
+
+                <div class="card">
+
+                    <div class="dashboard-label">
+                        Achievements
+                    </div>
+
+                    <div
+                        class="dashboard-number"
+                        id="dashboardAchievements"
+                    >
+                        0
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="card"
+                style="margin-top:20px;"
+            >
+
+                <h3>
+                    Today's Progress
+                </h3>
+
+                <div
+                    style="
+                    margin-top:20px;
+                    "
+                    id="dashboardDaily"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CHARACTER
+        ================================================= -->
+
+        <section
+            class="page"
+            id="page-character"
+        >
+
+            <div class="page-header">
+
+                <h1>
+                    Character
+                </h1>
+
+                <p>
+                    Your current real-life RPG character.
+                </p>
+
+            </div>
+
+
+            <div class="grid grid-2">
+
+
+                <!-- CHARACTER IDENTITY -->
+
+                <div class="card">
+
+                    <div class="character-avatar">
+                        ⚔
+                    </div>
+
+                    <h2
+                        style="text-align:center;"
+                        id="characterName"
+                    >
+                        PLAYER
+                    </h2>
+
+
+                    <!-- ADDED RANK -->
+
+                    <div
+                        class="character-rank-label"
+                    >
+                        RANK YOU'RE IN
+                    </div>
+
+                    <div
+                        class="character-rank"
+                        id="characterRank"
+                    >
+                        BRONZE
+                    </div>
+
+                </div>
+
+
+                <!-- CHARACTER PROGRESS -->
+
+                <div class="card">
+
+                    <h3>
+                        Character Progress
+                    </h3>
+
+                    <br>
+
+
+                    <div class="quest-info">
+
+                        <div class="quest-name">
+                            Level
+                        </div>
+
+                        <div
+                            style="
+                            font-size:30px;
+                            font-weight:900;
+                            margin-top:5px;
+                            "
+                            id="characterLevel"
+                        >
+                            1
+                        </div>
+
+                    </div>
+
+
+                    <br>
+
+
+                    <div class="quest-info">
+
+                        <div class="quest-name">
+                            Total XP
+                        </div>
+
+                        <div
+                            style="
+                            font-size:30px;
+                            font-weight:900;
+                            margin-top:5px;
+                            "
+                            id="characterXP"
+                        >
+                            0
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 CHARACTER STATS
+            ============================================== -->
+
+            <div
+                class="card"
+                style="margin-top:20px;"
+            >
+
+                <div
+                    style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    gap:15px;
+                    margin-bottom:20px;
+                    "
+                >
+
+                    <div>
+
+                        <h3>
+                            Unlocked Stats
+                        </h3>
+
+                        <p
+                            style="
+                            color:#555;
+                            font-size:12px;
+                            margin-top:5px;
+                            "
+                        >
+                            Your current stat progression.
+                        </p>
+
+                    </div>
+
+                    <div class="badge badge-red">
+                        MAX 1000
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="characterStatsContainer"
+                >
+
+                    <div class="character-no-stats">
+                        No stats unlocked yet.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             DAILY
+        ================================================= -->
+
+        <section
+            class="page"
+            id="page-daily"
+        >
+
+            <div class="page-header">
+
+                <h1>
+                    Daily Quests
+                </h1>
+
+                <p>
+                    Complete your daily responsibilities.
+                </p>
+
+            </div>
+
+            <div
+                class="card"
+                style="margin-bottom:20px;"
+            >
+
+                <div
+                    style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    "
+                >
+
+                    <div>
+                        <h3>
+                            Daily Progress
+                        </h3>
+
+                        <p
+                            style="
+                            color:#666;
+                            font-size:12px;
+                            margin-top:5px;
+                            "
+                            id="dailyProgressText"
+                        >
+                            0 / 0 completed
+                        </p>
+                    </div>
+
+                    <div
+                        style="
+                        font-size:25px;
+                        font-weight:900;
+                        "
+                        id="dailyXP"
+                    >
+                        +0 XP
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div
+                class="quest-list"
+                id="dailyQuestList"
+            ></div>
+
+        </section>
+
+
+        <!-- =================================================
+             WEEKLY
+        ================================================= -->
+
+        <section
+            class="page"
+            id="page-weekly"
+        >
+
+            <div class="page-header">
+
+                <h1>
+                    Weekly
+                </h1>
+
+                <p>
+                    Weekend and weekly objectives.
+                </p>
+
+            </div>
+
+            <div
+                class="quest-list"
+                id="weeklyQuestList"
+            ></div>
+
+        </section>
+
+
+        <!-- =================================================
+             MONTHLY
+        ================================================= -->
+
+        <section
+            class="page"
+            id="page-monthly"
+        >
+
+            <div class="page-header">
+
+                <h1>
+                    Monthly
+                </h1>
+
+                <p>
+                    Long-term responsibilities.
+                </p>
+
+            </div>
+
+            <div
+                class="quest-list"
+                id="monthlyQuestList"
+            ></div>
+
+        </section>
+
+
+        <!-- =================================================
+             CUSTOM
+        ================================================= -->
+
+        <section
+            class="page"
+            id="page-custom"
+        >
+
+            <div class="page-header">
+
+                <h1>
+                    Custom Quests
+                </h1>
+
+                <p>
+                    Create your own challenges.
+                </p>
+
+            </div>
+
+
+            <div
+                class="card"
+                style="margin-bottom:20px;"
+            >
+
+                <button
+                    class="btn btn-primary"
+                    onclick="openCustomQuestModal()"
+                >
+                    + Add Custom Quest
+                </button>
+
+            </div>
+
+
+            <div
+                class="quest-list"
+                id="customQuestList"
+            ></div>
+
+        </section>
+
+
+        <!-- =================================================
+             RANKS
+        ================================================= -->
+
+        <section
+            class="page"
+            id="page-ranks"
+        >
+
+            <div class="page-header">
+
+                <h1>
+                    Ranks
+                </h1>
+
+                <p>
+                    Climb from Bronze to Master.
+                </p>
+
+            </div>
+
+            <div
+                class="grid grid-2"
+                id="rankList"
+            ></div>
+
+        </section>
+
+
+        <!-- =================================================
+             STATS
+        ================================================= -->
+
+        <section
+            class="page"
+            id="page-stats"
+        >
+
+            <div class="page-header">
+
+                <h1>
+                    Stats
+                </h1>
+
+                <p>
+                    Build every part of yourself.
+                </p>
+
+            </div>
+
+            <div
+                class="grid grid-3"
+                id="statsList"
+            ></div>
+
+        </section>
+
+
+        <!-- =================================================
+             ACHIEVEMENTS
+        ================================================= -->
+
+        <section
+            class="page"
+            id="page-achievements"
+        >
+
+            <div class="page-header">
+
+                <h1>
+                    Achievements
+                </h1>
+
+                <p>
+                    Around 500 hidden achievements
+                    waiting to be discovered.
+                </p>
+
+            </div>
+
+
+            <div
+                class="card"
+                style="margin-bottom:20px;"
+            >
+
+                <div
+                    style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    "
+                >
+
+                    <div>
+
+                        <h3>
+                            Achievement Progress
+                        </h3>
+
+                        <p
+                            style="
+                            color:#666;
+                            font-size:12px;
+                            margin-top:5px;
+                            "
+                            id="achievementProgress"
+                        >
+                            0 / 500
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="grid grid-3"
+                id="achievementList"
+            ></div>
+
+        </section>
+
+
+        <!-- =================================================
+             BOSSES
+        ================================================= -->
+
+        <section
+            class="page"
+            id="page-bosses"
+        >
+
+            <div class="page-header">
+
+                <h1>
+                    Bosses
+                </h1>
+
+                <p>
+                    Every rank has an obstacle to overcome.
+                </p>
+
+            </div>
+
+            <div
+                class="grid grid-2"
+                id="bossList"
+            ></div>
+
+        </section>
+
+
+        <!-- =================================================
+             SCHOOL
+        ================================================= -->
+
+        <section
+            class="page"
+            id="page-school"
+        >
+
+            <div class="page-header">
+
+                <h1>
+                    School Routine
+                </h1>
+
+                <p>
+                    Your Monday-Friday school routine.
+                </p>
+
+            </div>
+
+
+            <div
+                class="card"
+                id="schoolStatusCard"
+                style="margin-bottom:20px;"
+            >
+
+                <div
+                    style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    gap:20px;
+                    "
+                >
+
+                    <div>
+
+                        <div
+                            id="schoolStatus"
+                            style="
+                            font-weight:900;
+                            letter-spacing:2px;
+                            "
+                        >
+                            SCHOOL ROUTINE
+                        </div>
+
+                        <div
+                            id="schoolStatusText"
+                            style="
+                            color:#666;
+                            margin-top:5px;
+                            font-size:12px;
+                            "
+                        ></div>
+
+                    </div>
+
+                    <div
+                        id="schoolCountdown"
+                        class="countdown"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="quest-list"
+                id="schoolRoutineList"
+            ></div>
+
+        </section>
+
+
+        <!-- =================================================
+             PROFILE
+        ================================================= -->
+
+        <section
+            class="page"
+            id="page-profile"
+        >
+
+            <div class="page-header">
+
+                <h1>
+                    Profile
+                </h1>
+
+                <p>
+                    Your LIFE RPG identity.
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    Username
+                </h3>
+
+                <div
+                    style="
+                    display:flex;
+                    gap:10px;
+                    margin-top:12px;
+                    "
+                >
+
+                    <input
+                        class="input"
+                        id="usernameInput"
+                        placeholder="Enter your name"
+                    >
+
+                    <button
+                        class="btn btn-primary"
+                        onclick="saveUsername()"
+                    >
+                        Save
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="card"
+                style="margin-top:20px;"
+            >
+
+                <h3>
+                    Danger Zone
+                </h3>
+
+                <p
+                    style="
+                    color:#666;
+                    font-size:12px;
+                    margin:8px 0 15px;
+                    "
+                >
+                    This permanently resets your LIFE RPG progress.
+                </p>
+
+                <button
+                    class="btn btn-danger"
+                    onclick="resetGame()"
+                >
+                    Reset Progress
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             FINAL
+        ================================================= -->
+
+        <section
+            class="page"
+            id="page-final"
+        >
+
+            <div class="final-card card">
+
+                <h1>
+                    now what?...
+                </h1>
+
+                <div
+                    class="final-message"
+                    id="finalMessage"
+                >
+                    now you are the person you were always ment
+                    to become, I am proud of you, PLAYER
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+<!-- =====================================================
+     CUSTOM QUEST MODAL
+===================================================== -->
+
+<div
+    class="modal"
+    id="customQuestModal"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h3>
+                Create Custom Quest
+            </h3>
+
+            <button
+                class="modal-close"
+                onclick="closeCustomQuestModal()"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <label
+            style="
+            display:block;
+            color:#777;
+            font-size:12px;
+            margin-bottom:6px;
+            "
+        >
+            Quest Name
+        </label>
+
+        <input
+            class="input"
+            id="customQuestName"
+            placeholder="Enter quest name"
+        >
+
+
+        <label
+            style="
+            display:block;
+            color:#777;
+            font-size:12px;
+            margin:15px 0 6px;
+            "
+        >
+            Description
+        </label>
+
+        <textarea
+            class="textarea"
+            id="customQuestDescription"
+            placeholder="What do you need to accomplish?"
+        ></textarea>
+
+
+        <label
+            style="
+            display:block;
+            color:#777;
+            font-size:12px;
+            margin:15px 0 6px;
+            "
+        >
+            XP Reward
+        </label>
+
+        <select
+            class="select"
+            id="customQuestXP"
+        >
+
+            <option value="25">
+                25 XP
+            </option>
+
+            <option value="50">
+                50 XP
+            </option>
+
+            <option value="75">
+                75 XP
+            </option>
+
+            <option value="100">
+                100 XP
+            </option>
+
+            <option value="125">
+                125 XP
+            </option>
+
+            <option value="150">
+                150 XP
+            </option>
+
+            <option value="175">
+                175 XP
+            </option>
+
+            <option value="200">
+                200 XP
+            </option>
+
+        </select>
+
+
+        <button
+            class="btn btn-primary"
+            style="
+            width:100%;
+            margin-top:20px;
+            "
+            onclick="createCustomQuest()"
+        >
+            Create Quest
+        </button>
+
+    </div>
+
+</div>
+
+
+<div id="toast-container"></div>
+
+
+<script>
+
+/* =========================================================
+   RANKS
+========================================================= */
+
+const RANKS = [
+
+    {
+        name:"BRONZE",
+        xp:0
+    },
+
+    {
+        name:"SILVER",
+        xp:500
+    },
+
+    {
+        name:"IRON",
+        xp:1200
+    },
+
+    {
+        name:"GOLD",
+        xp:2200
+    },
+
+    {
+        name:"PLATINUM",
+        xp:3600
+    },
+
+    {
+        name:"DIAMOND",
+        xp:5500
+    },
+
+    {
+        name:"CHAMPION",
+        xp:8000
+    },
+
+    {
+        name:"ELITE",
+        xp:11000
+    },
+
+    {
+        name:"LEGEND",
+        xp:15000
+    },
+
+    {
+        name:"MASTER",
+        xp:20000
+    }
+
+];
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+const STAT_NAMES = [
+
+    "Discipline",
+    "Focus",
+    "Strength",
+    "Mental Strength",
+    "Social",
+    "Endurance",
+    "Intelligence",
+    "Health",
+    "Consistency",
+    "Confidence",
+    "Productivity",
+    "Knowledge",
+    "Resilience"
+
+];
+
+
+/*
+    Stats unlock progressively.
+
+    Discipline begins unlocked.
+    The others unlock as the player progresses.
+*/
+
+const STAT_UNLOCK_LEVELS = {
+
+    "Discipline":0,
+    "Focus":5,
+    "Strength":10,
+    "Mental Strength":15,
+    "Social":20,
+    "Endurance":25,
+    "Intelligence":30,
+    "Health":35,
+    "Consistency":40,
+    "Confidence":45,
+    "Productivity":50,
+    "Knowledge":60,
+    "Resilience":75
+
+};
+
+
+/* =========================================================
+   DAILY QUESTS
+========================================================= */
+
+const DAILY_QUESTS = [
+
+    {
+        id:"shower",
+        name:"Shower",
+        description:"Keep yourself clean and ready for the day.",
+        xp:25
+    },
+
+    {
+        id:"brush1",
+        name:"Brush Teeth — Morning",
+        description:"Brush your teeth in the morning.",
+        xp:15
+    },
+
+    {
+        id:"brush2",
+        name:"Brush Teeth — Afternoon",
+        description:"Brush your teeth during the day.",
+        xp:15
+    },
+
+    {
+        id:"brush3",
+        name:"Brush Teeth — Night",
+        description:"Brush your teeth before bed.",
+        xp:15
+    },
+
+    {
+        id:"bed",
+        name:"Make Your Bed",
+        description:"Make your bed every morning.",
+        xp:20
+    },
+
+    {
+        id:"pets",
+        name:"Clean Up Pets",
+        description:"Clean up after your pets.",
+        xp:25
+    },
+
+    {
+        id:"sweep",
+        name:"Sweep House",
+        description:"Keep the house clean.",
+        xp:25
+    },
+
+    {
+        id:"gym",
+        name:"Go Gym",
+        description:"Complete your training.",
+        xp:50
+    },
+
+    {
+        id:"food",
+        name:"Eat Properly",
+        description:"Eat enough proper food for the day.",
+        xp:30
+    },
+
+    {
+        id:"water",
+        name:"Drink 2L Water",
+        description:"Reach your daily water target.",
+        xp:25
+    },
+
+    {
+        id:"creatine",
+        name:"Take Creatine",
+        description:"Complete your daily routine.",
+        xp:15
+    },
+
+    {
+        id:"shilajit",
+        name:"Take Shilajit",
+        description:"Complete your daily routine.",
+        xp:15
+    },
+
+    {
+        id:"vitamins",
+        name:"Take Vitamins",
+        description:"Complete your daily routine.",
+        xp:15
+    },
+
+    {
+        id:"study",
+        name:"Study — Minimum 1h30m",
+        description:"Complete at least 1 hour 30 minutes of study.",
+        xp:60
+    }
+
+];
+
+
+/* =========================================================
+   WEEKLY QUESTS
+========================================================= */
+
+const WEEKLY_QUESTS = [
+
+    {
+        id:"vacuum",
+        name:"Vacuum House",
+        description:"Vacuum the house every Saturday or Sunday.",
+        xp:75
+    },
+
+    {
+        id:"room",
+        name:"Deep Clean Room",
+        description:"No trash, no clothes waiting to be washed.",
+        xp:75
+    },
+
+    {
+        id:"weekend-revision-sat",
+        name:"Weekend Revision — Saturday",
+        description:"Revise for at least 45 minutes if needed.",
+        xp:50
+    },
+
+    {
+        id:"weekend-revision-sun",
+        name:"Weekend Revision — Sunday",
+        description:"Revise for at least 45 minutes if needed.",
+        xp:50
+    },
+
+    {
+        id:"weekend-chores",
+        name:"Weekend Chores",
+        description:"Complete any chores that need doing.",
+        xp:50
+    }
+
+];
+
+
+/* =========================================================
+   MONTHLY QUESTS
+========================================================= */
+
+const MONTHLY_QUESTS = [
+
+    {
+        id:"bedsheets",
+        name:"Change Bedsheets",
+        description:"Change your bedsheets.",
+        xp:100
+    },
+
+    {
+        id:"towels",
+        name:"Change Towels",
+        description:"Change your towels if possible.",
+        xp:75
+    },
+
+    {
+        id:"school-review",
+        name:"School Progress Review",
+        description:
+            "Review everything covered in school so far and make sure you understand it.",
+        xp:150
+    }
+
+];
+
+
+/* =========================================================
+   SCHOOL ROUTINE
+========================================================= */
+
+const SCHOOL_ROUTINE = [
+
+    {
+        id:"school-wake",
+        time:"07:00",
+        name:"Wake Up",
+        description:"Get up at 07:00.",
+        xp:15
+    },
+
+    {
+        id:"school-dress",
+        time:"Morning",
+        name:"Get Dressed",
+        description:"Get ready for school.",
+        xp:10
+    },
+
+    {
+        id:"school-food",
+        time:"Morning",
+        name:"Go Downstairs & Make Food",
+        description:"Make your food before school.",
+        xp:15
+    },
+
+    {
+        id:"school-cats-clean",
+        time:"Morning",
+        name:"Clean Cats Properly",
+        description:"Clean up properly after the cats.",
+        xp:20
+    },
+
+    {
+        id:"school-cats-water",
+        time:"Morning",
+        name:"Give Cats Clean Water",
+        description:"Give the cats fresh clean water.",
+        xp:15
+    },
+
+    {
+        id:"school-cats-feed",
+        time:"Morning",
+        name:"Feed Cats",
+        description:"Feed the cats.",
+        xp:15
+    },
+
+    {
+        id:"school-litter",
+        time:"Morning",
+        name:"Clean Litter Box",
+        description:"Clean the litter box.",
+        xp:20
+    },
+
+    {
+        id:"school-leave",
+        time:"08:10",
+        name:"Leave For School",
+        description:"Leave at 08:10.",
+        xp:15
+    },
+
+    {
+        id:"school-return",
+        time:"~16:10",
+        name:"Return Home",
+        description:"Return home from school.",
+        xp:10
+    },
+
+    {
+        id:"school-gym",
+        time:"16:10–17:50",
+        name:"Go Gym",
+        description:"Train after school.",
+        xp:50
+    },
+
+    {
+        id:"school-shower",
+        time:"After Gym",
+        name:"Come Home & Shower",
+        description:"Shower after training.",
+        xp:20
+    },
+
+    {
+        id:"school-eat",
+        time:"After Shower",
+        name:"Eat",
+        description:"Have your meal.",
+        xp:20
+    },
+
+    {
+        id:"school-study",
+        time:"Evening",
+        name:"Go Upstairs & Study",
+        description:"Study after your evening routine.",
+        xp:50
+    },
+
+    {
+        id:"school-dinner",
+        time:"21:30",
+        name:"Dinner",
+        description:"Have dinner.",
+        xp:20
+    },
+
+    {
+        id:"school-free",
+        time:"21:30 → Sleep",
+        name:"Free Time",
+        description:"Enjoy your free time.",
+        xp:5
+    },
+
+    {
+        id:"school-sleep",
+        time:"Before 01:00",
+        name:"Go To Sleep",
+        description:"Try to sleep before 01:00.",
+        xp:30
+    }
+
+];
+
+
+/* =========================================================
+   BOSSES
+========================================================= */
+
+const BOSSES = [
+
+    {
+        rank:"BRONZE",
+        name:"THE LAZY BEAST",
+        hp:100,
+        reward:150
+    },
+
+    {
+        rank:"SILVER",
+        name:"THE PROCRASTINATOR",
+        hp:150,
+        reward:250
+    },
+
+    {
+        rank:"IRON",
+        name:"THE COMFORT CREATURE",
+        hp:200,
+        reward:350
+    },
+
+    {
+        rank:"GOLD",
+        name:"THE DISTRACTOR",
+        hp:275,
+        reward:450
+    },
+
+    {
+        rank:"PLATINUM",
+        name:"THE DOUBTER",
+        hp:350,
+        reward:600
+    },
+
+    {
+        rank:"DIAMOND",
+        name:"THE KNOWLEDGE KEEPER",
+        hp:450,
+        reward:800
+    },
+
+    {
+        rank:"CHAMPION",
+        name:"THE DISCIPLINE DEMON",
+        hp:600,
+        reward:1000
+    },
+
+    {
+        rank:"ELITE",
+        name:"THE LIMIT BREAKER",
+        hp:800,
+        reward:1250
+    },
+
+    {
+        rank:"LEGEND",
+        name:"THE FINAL OBSTACLE",
+        hp:1000,
+        reward:1500
+    },
+
+    {
+        rank:"MASTER",
+        name:"THE FINAL BOSS",
+        hp:1500,
+        reward:2500
+    }
+
+];
+
+
+/* =========================================================
+   ACHIEVEMENTS
+========================================================= */
+
+/*
+    The system supports the full 500 achievement slots.
+    The first achievements have real definitions.
+    Remaining hidden achievements are generated so the
+    progression system always contains approximately 500.
+*/
+
+const ACHIEVEMENTS = [
+
+    {
+        id:"first-step",
+        name:"First Step",
+        description:"Complete your first quest.",
+        xp:25,
+        category:"Progression",
+        rarity:"Common"
+    },
+
+    {
+        id:"gym-rat",
+        name:"Gym Rat",
+        description:"Complete 25 gym quests.",
+        xp:100,
+        category:"Gym",
+        rarity:"Rare"
+    },
+
+    {
+        id:"body-builder",
+        name:"Body Builder",
+        description:"Complete 100 gym quests.",
+        xp:250,
+        category:"Strength",
+        rarity:"Epic"
+    },
+
+    {
+        id:"study-grind",
+        name:"Study Grind",
+        description:"Complete 25 study quests.",
+        xp:100,
+        category:"Study",
+        rarity:"Rare"
+    },
+
+    {
+        id:"discipline",
+        name:"Discipline",
+        description:"Reach Discipline level 10.",
+        xp:100,
+        category:"Discipline",
+        rarity:"Rare"
+    },
+
+    {
+        id:"focus",
+        name:"Laser Focus",
+        description:"Unlock Focus.",
+        xp:100,
+        category:"Focus",
+        rarity:"Rare"
+    },
+
+    {
+        id:"silver",
+        name:"Silver",
+        description:"Reach Silver rank.",
+        xp:150,
+        category:"Ranks",
+        rarity:"Rare"
+    },
+
+    {
+        id:"gold",
+        name:"Gold",
+        description:"Reach Gold rank.",
+        xp:250,
+        category:"Ranks",
+        rarity:"Epic"
+    },
+
+    {
+        id:"diamond",
+        name:"Diamond",
+        description:"Reach Diamond rank.",
+        xp:500,
+        category:"Ranks",
+        rarity:"Legendary"
+    },
+
+    {
+        id:"master",
+        name:"Master",
+        description:"Reach Master rank.",
+        xp:1000,
+        category:"Ranks",
+        rarity:"Mythic"
+    },
+
+    {
+        id:"legend",
+        name:"Legend",
+        description:"Reach Legend rank.",
+        xp:750,
+        category:"Ranks",
+        rarity:"Legendary"
+    },
+
+    {
+        id:"og",
+        name:"OG",
+        description:"Become one of the earliest dedicated players.",
+        xp:250,
+        category:"Secret",
+        rarity:"Secret"
+    },
+
+    {
+        id:"first-boss",
+        name:"Boss Slayer",
+        description:"Defeat your first rank boss.",
+        xp:150,
+        category:"Bosses",
+        rarity:"Rare"
+    },
+
+    {
+        id:"weekend-warrior",
+        name:"Weekend Warrior",
+        description:"Complete your weekend objectives.",
+        xp:100,
+        category:"Weekly",
+        rarity:"Rare"
+    },
+
+    {
+        id:"consistent",
+        name:"Consistency",
+        description:"Maintain a long daily streak.",
+        xp:200,
+        category:"Discipline",
+        rarity:"Epic"
+    },
+
+    {
+        id:"total-mastery",
+        name:"Total Mastery",
+        description:
+            "Unlock every achievement, complete Master rank, and reach 1000 in every stat.",
+        xp:0,
+        category:"Ultimate",
+        rarity:"FINAL"
+    }
+
+];
+
+
+/* Generate remaining hidden achievements */
+
+while(ACHIEVEMENTS.length < 500){
+
+    const number = ACHIEVEMENTS.length + 1;
+
+    ACHIEVEMENTS.push({
+
+        id:"secret-" + number,
+
+        name:"Hidden Achievement #" + number,
+
+        description:"A hidden achievement waiting to be discovered.",
+
+        xp:
+            number % 5 === 0
+                ? 100
+                : 50,
+
+        category:"Secret",
+
+        rarity:"Secret"
+
+    });
+
+}
+
+
+/* =========================================================
+   DEFAULT STATE
+========================================================= */
+
+const DEFAULT_STATE = {
+
+    username:"PLAYER",
+
+    xp:0,
+
+    level:1,
+
+    dailyCompleted:{},
+
+    weeklyCompleted:{},
+
+    monthlyCompleted:{},
+
+    schoolCompleted:{},
+
+    customQuests:[],
+
+    unlockedAchievements:[],
+
+    defeatedBosses:[],
+
+    stats:{},
+
+    statXP:{},
+
+    streak:0,
+
+    lastDailyDate:"",
+
+    lastWeeklyDate:"",
+
+    lastMonthlyDate:"",
+
+    lastSchoolDate:"",
+
+    finalUnlocked:false
+
+};
+
+
+/* =========================================================
+   LOAD STATE
+========================================================= */
+
+let state = loadState();
+
+
+function loadState(){
+
+    try{
+
+        const saved =
+            localStorage.getItem("lifeRPGState");
+
+        if(!saved){
+
+            return structuredClone(DEFAULT_STATE);
+
+        }
+
+        const parsed =
+            JSON.parse(saved);
+
+        return {
+
+            ...structuredClone(DEFAULT_STATE),
+
+            ...parsed,
+
+            dailyCompleted:
+                parsed.dailyCompleted || {},
+
+            weeklyCompleted:
+                parsed.weeklyCompleted || {},
+
+            monthlyCompleted:
+                parsed.monthlyCompleted || {},
+
+            schoolCompleted:
+                parsed.schoolCompleted || {},
+
+            customQuests:
+                parsed.customQuests || [],
+
+            unlockedAchievements:
+                parsed.unlockedAchievements || [],
+
+            defeatedBosses:
+                parsed.defeatedBosses || [],
+
+            stats:
+                parsed.stats || {},
+
+            statXP:
+                parsed.statXP || {}
+
+        };
+
+    }catch(error){
+
+        console.error(error);
+
+        return structuredClone(DEFAULT_STATE);
+
+    }
+
+}
+
+
+/* =========================================================
+   SAVE
+========================================================= */
+
+function saveState(){
+
+    localStorage.setItem(
+        "lifeRPGState",
+        JSON.stringify(state)
+    );
+
+}
+
+
+/* =========================================================
+   DATE HELPERS
+========================================================= */
+
+function todayKey(){
+
+    const date = new Date();
+
+    return date.toISOString().slice(0,10);
+
+}
+
+
+function getMondayKey(){
+
+    const date = new Date();
+
+    const day = date.getDay();
+
+    const diff =
+        day === 0
+            ? -6
+            : 1 - day;
+
+    date.setDate(
+        date.getDate() + diff
+    );
+
+    return date.toISOString().slice(0,10);
+
+}
+
+
+function monthKey(){
+
+    const date = new Date();
+
+    return (
+        date.getFullYear() +
+        "-" +
+        String(date.getMonth()+1).padStart(2,"0")
+    );
+
+}
+
+
+function isWeekend(){
+
+    const day =
+        new Date().getDay();
+
+    return day === 0 || day === 6;
+
+}
+
+
+/* =========================================================
+   DATE RESET
+========================================================= */
+
+function handleResets(){
+
+    const today =
+        todayKey();
+
+    const week =
+        getMondayKey();
+
+    const month =
+        monthKey();
+
+
+    if(state.lastDailyDate !== today){
+
+        state.dailyCompleted = {};
+
+        state.schoolCompleted = {};
+
+        state.lastDailyDate = today;
+
+    }
+
+
+    if(state.lastWeeklyDate !== week){
+
+        state.weeklyCompleted = {};
+
+        state.lastWeeklyDate = week;
+
+    }
+
+
+    if(state.lastMonthlyDate !== month){
+
+        state.monthlyCompleted = {};
+
+        state.lastMonthlyDate = month;
+
+    }
+
+
+    saveState();
+
+}
+
+
+/* =========================================================
+   RANK
+========================================================= */
+
+function getCurrentRank(){
+
+    let current =
+        RANKS[0];
+
+    for(const rank of RANKS){
+
+        if(state.xp >= rank.xp){
+
+            current = rank;
+
+        }
+
+    }
+
+    return current;
+
+}
+
+
+function getRankIndex(){
+
+    return RANKS.findIndex(
+        rank =>
+            rank.name ===
+            getCurrentRank().name
+    );
+
+}
+
+
+/* =========================================================
+   XP / LEVEL
+========================================================= */
+
+function xpForLevel(level){
+
+    return Math.floor(
+        100 * Math.pow(level,1.35)
+    );
+
+}
+
+
+function getLevelFromXP(xp){
+
+    let level = 1;
+
+    while(
+        xp >= xpForLevel(level + 1) &&
+        level < 1000
+    ){
+
+        level++;
+
+    }
+
+    return level;
+
+}
+
+
+function addXP(amount){
+
+    const oldLevel =
+        state.level;
+
+    state.xp += amount;
+
+    state.level =
+        getLevelFromXP(state.xp);
+
+    state.xp =
+        Math.max(
+            0,
+            state.xp
+        );
+
+    checkAchievements();
+
+    checkFinalMastery();
+
+    saveState();
+
+    renderAll();
+
+    if(state.level > oldLevel){
+
+        showToast(
+            "LEVEL UP — LEVEL " +
+            state.level
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   STAT SYSTEM
+========================================================= */
+
+function isStatUnlocked(stat){
+
+    return state.level >=
+        STAT_UNLOCK_LEVELS[stat];
+
+}
+
+
+function getStatLevel(stat){
+
+    if(!isStatUnlocked(stat)){
+
+        return 0;
+
+    }
+
+    if(
+        typeof state.stats[stat] !==
+        "number"
+    ){
+
+        return 0;
+
+    }
+
+    return Math.min(
+        1000,
+        state.stats[stat]
+    );
+
+}
+
+
+function getStatXP(stat){
+
+    return state.statXP[stat] || 0;
+
+}
+
+
+function statXPRequired(level){
+
+    if(level >= 1000){
+
+        return 0;
+
+    }
+
+    return Math.floor(
+        50 *
+        Math.pow(
+            level + 1,
+            1.18
+        )
+    );
+
+}
+
+
+function addStatXP(stat, amount){
+
+    if(!isStatUnlocked(stat)){
+
+        return;
+
+    }
+
+    if(
+        typeof state.stats[stat] !==
+        "number"
+    ){
+
+        state.stats[stat] = 0;
+
+    }
+
+    if(
+        typeof state.statXP[stat] !==
+        "number"
+    ){
+
+        state.statXP[stat] = 0;
+
+    }
+
+
+    if(state.stats[stat] >= 1000){
+
+        state.stats[stat] = 1000;
+
+        state.statXP[stat] = 0;
+
+        return;
+
+    }
+
+
+    state.statXP[stat] += amount;
+
+
+    while(
+        state.stats[stat] < 1000 &&
+        state.statXP[stat] >=
+            statXPRequired(
+                state.stats[stat]
+            )
+    ){
+
+        state.statXP[stat] -=
+            statXPRequired(
+                state.stats[stat]
+            );
+
+        state.stats[stat]++;
+
+    }
+
+
+    if(state.stats[stat] >= 1000){
+
+        state.stats[stat] = 1000;
+
+        state.statXP[stat] = 0;
+
+    }
+
+
+    saveState();
+
+}
+
+
+/* =========================================================
+   QUEST STAT REWARDS
+========================================================= */
+
+function applyStatReward(quest){
+
+    if(!isStatUnlocked("Discipline")){
+
+        return;
+
+    }
+
+    addStatXP(
+        "Discipline",
+        Math.max(
+            1,
+            Math.floor(quest.xp / 5)
+        )
+    );
+
+
+    if(
+        quest.id.includes("study") ||
+        quest.id.includes("school")
+    ){
+
+        if(
+            isStatUnlocked("Focus")
+        ){
+
+            addStatXP(
+                "Focus",
+                Math.max(
+                    1,
+                    Math.floor(
+                        quest.xp / 7
+                    )
+                )
+            );
+
+        }
+
+        if(
+            isStatUnlocked("Intelligence")
+        ){
+
+            addStatXP(
+                "Intelligence",
+                Math.max(
+                    1,
+                    Math.floor(
+                        quest.xp / 8
+                    )
+                )
+            );
+
+        }
+
+    }
+
+
+    if(
+        quest.id.includes("gym")
+    ){
+
+        if(
+            isStatUnlocked("Strength")
+        ){
+
+            addStatXP(
+                "Strength",
+                Math.max(
+                    1,
+                    Math.floor(
+                        quest.xp / 4
+                    )
+                )
+            );
+
+        }
+
+        if(
+            isStatUnlocked("Endurance")
+        ){
+
+            addStatXP(
+                "Endurance",
+                Math.max(
+                    1,
+                    Math.floor(
+                        quest.xp / 6
+                    )
+                )
+            );
+
+        }
+
+    }
+
+
+    if(
+        quest.id.includes("water") ||
+        quest.id.includes("food") ||
+        quest.id.includes("shower")
+    ){
+
+        if(
+            isStatUnlocked("Health")
+        ){
+
+            addStatXP(
+                "Health",
+                Math.max(
+                    1,
+                    Math.floor(
+                        quest.xp / 5
+                    )
+                )
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   QUEST COMPLETE
+========================================================= */
+
+function completeQuest(
+    type,
+    id,
+    quest
+){
+
+    let collection;
+
+
+    if(type === "daily"){
+
+        collection =
+            state.dailyCompleted;
+
+    }
+
+    else if(type === "weekly"){
+
+        collection =
+            state.weeklyCompleted;
+
+    }
+
+    else if(type === "monthly"){
+
+        collection =
+            state.monthlyCompleted;
+
+    }
+
+    else if(type === "school"){
+
+        collection =
+            state.schoolCompleted;
+
+    }
+
+
+    if(!collection){
+
+        return;
+
+    }
+
+
+    if(collection[id]){
+
+        return;
+
+    }
+
+
+    collection[id] = true;
+
+
+    addXP(
+        quest.xp
+    );
+
+    applyStatReward(
+        quest
+    );
+
+    saveState();
+
+    renderAll();
+
+    showToast(
+        "+" +
+        quest.xp +
+        " XP"
+    );
+
+}
+
+
+/* =========================================================
+   CUSTOM QUEST
+========================================================= */
+
+function openCustomQuestModal(){
+
+    document
+        .getElementById(
+            "customQuestModal"
+        )
+        .classList.add("open");
+
+}
+
+
+function closeCustomQuestModal(){
+
+    document
+        .getElementById(
+            "customQuestModal"
+        )
+        .classList.remove("open");
+
+}
+
+
+function createCustomQuest(){
+
+    const name =
+        document
+            .getElementById(
+                "customQuestName"
+            )
+            .value
+            .trim();
+
+    const description =
+        document
+            .getElementById(
+                "customQuestDescription"
+            )
+            .value
+            .trim();
+
+    const xp =
+        Number(
+            document
+                .getElementById(
+                    "customQuestXP"
+                )
+                .value
+        );
+
+
+    if(!name){
+
+        showToast(
+            "Enter a quest name."
+        );
+
+        return;
+
+    }
+
+
+    state.customQuests.push({
+
+        id:
+            "custom-" +
+            Date.now(),
+
+        name,
+
+        description,
+
+        xp,
+
+        completed:false
+
+    });
+
+
+    saveState();
+
+    closeCustomQuestModal();
+
+    document
+        .getElementById(
+            "customQuestName"
+        )
+        .value = "";
+
+    document
+        .getElementById(
+            "customQuestDescription"
+        )
+        .value = "";
+
+    renderAll();
+
+    showToast(
+        "Custom quest created."
+    );
+
+}
+
+
+function completeCustomQuest(id){
+
+    const quest =
+        state.customQuests.find(
+            q => q.id === id
+        );
+
+    if(!quest || quest.completed){
+
+        return;
+
+    }
+
+
+    quest.completed = true;
+
+    addXP(
+        quest.xp
+    );
+
+    applyStatReward(
+        quest
+    );
+
+    saveState();
+
+    renderAll();
+
+    showToast(
+        "+" +
+        quest.xp +
+        " XP"
+    );
+
+}
+
+
+/* =========================================================
+   RENDER QUESTS
+========================================================= */
+
+function renderQuestList(
+    elementId,
+    quests,
+    completedObject,
+    type
+){
+
+    const element =
+        document.getElementById(
+            elementId
+        );
+
+    if(!element){
+
+        return;
+
+    }
+
+
+    element.innerHTML = "";
+
+
+    quests.forEach(
+        quest => {
+
+            const completed =
+                !!completedObject[
+                    quest.id
+                ];
+
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+            item.className =
+                "quest " +
+                (
+                    completed
+                        ? "completed"
+                        : ""
+                );
+
+
+            item.innerHTML = `
+
+                <div
+                    class="quest-checkbox"
+                    onclick="completeQuest(
+                        '${type}',
+                        '${quest.id}',
+                        ${JSON.stringify(quest).replace(/"/g,'&quot;')}
+                    )"
+                >
+                    ${completed ? "✓" : ""}
+                </div>
+
+                <div class="quest-info">
+
+                    <div class="quest-name">
+                        ${escapeHTML(quest.name)}
+                    </div>
+
+                    <div class="quest-description">
+                        ${escapeHTML(quest.description)}
+                    </div>
+
+                </div>
+
+                <div class="quest-xp">
+                    +${quest.xp} XP
+                </div>
+
+            `;
+
+
+            element.appendChild(
+                item
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   CUSTOM QUEST RENDER
+========================================================= */
+
+function renderCustomQuests(){
+
+    const container =
+        document.getElementById(
+            "customQuestList"
+        );
+
+    container.innerHTML = "";
+
+
+    if(
+        state.customQuests.length === 0
+    ){
+
+        container.innerHTML = `
+
+            <div class="card">
+
+                <p style="color:#555;">
+                    No custom quests yet.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    state.customQuests.forEach(
+        quest => {
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+            item.className =
+                "quest " +
+                (
+                    quest.completed
+                        ? "completed"
+                        : ""
+                );
+
+
+            item.innerHTML = `
+
+                <div
+                    class="quest-checkbox"
+                    onclick="completeCustomQuest('${quest.id}')"
+                >
+                    ${quest.completed ? "✓" : ""}
+                </div>
+
+                <div class="quest-info">
+
+                    <div class="quest-name">
+                        ${escapeHTML(quest.name)}
+                    </div>
+
+                    <div class="quest-description">
+                        ${escapeHTML(quest.description)}
+                    </div>
+
+                </div>
+
+                <div class="quest-xp">
+                    +${quest.xp} XP
+                </div>
+
+            `;
+
+
+            container.appendChild(
+                item
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   CHARACTER RENDER
+========================================================= */
+
+function renderCharacter(){
+
+    document.getElementById(
+        "characterName"
+    ).textContent =
+        state.username;
+
+
+    /*
+        Current rank is shown clearly
+        in the Character section.
+    */
+
+    document.getElementById(
+        "characterRank"
+    ).textContent =
+        getCurrentRank().name;
+
+
+    document.getElementById(
+        "characterLevel"
+    ).textContent =
+        state.level;
+
+
+    document.getElementById(
+        "characterXP"
+    ).textContent =
+        state.xp.toLocaleString();
+
+
+    renderCharacterStats();
+
+}
+
+
+/* =========================================================
+   CHARACTER STATS
+========================================================= */
+
+function renderCharacterStats(){
+
+    const container =
+        document.getElementById(
+            "characterStatsContainer"
+        );
+
+    if(!container){
+
+        return;
+
+    }
+
+
+    container.innerHTML = "";
+
+
+    const unlockedStats =
+        STAT_NAMES.filter(
+            stat =>
+                isStatUnlocked(stat)
+        );
+
+
+    if(unlockedStats.length === 0){
+
+        container.innerHTML = `
+
+            <div class="character-no-stats">
+                No stats unlocked yet.
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    unlockedStats.forEach(
+        stat => {
+
+            const level =
+                getStatLevel(stat);
+
+            const currentXP =
+                getStatXP(stat);
+
+            const requiredXP =
+                statXPRequired(level);
+
+
+            let progress = 100;
+
+
+            if(level < 1000){
+
+                progress =
+                    requiredXP > 0
+                        ? (
+                            currentXP /
+                            requiredXP
+                        ) * 100
+                        : 0;
+
+            }
+
+
+            progress =
+                Math.min(
+                    100,
+                    Math.max(
+                        0,
+                        progress
+                    )
+                );
+
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "character-stat";
+
+
+            card.innerHTML = `
+
+                <div class="character-stat-top">
+
+                    <div class="character-stat-name">
+                        ${escapeHTML(stat)}
+                    </div>
+
+                    <div class="character-stat-value">
+                        ${level} / 1000
+                    </div>
+
+                </div>
+
+
+                <div class="progress-track">
+
+                    <div
+                        class="progress-fill"
+                        style="
+                        width:${progress}%;
+                        "
+                    ></div>
+
+                </div>
+
+
+                <div class="character-stat-progress-text">
+
+                    ${
+                        level >= 1000
+                            ? "MAXIMUM STAT"
+                            :
+                        currentXP +
+                        " / " +
+                        requiredXP +
+                        " XP to next level"
+                    }
+
+                </div>
+
+            `;
+
+
+            container.appendChild(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   RENDER STATS PAGE
+========================================================= */
+
+function renderStats(){
+
+    const container =
+        document.getElementById(
+            "statsList"
+        );
+
+    container.innerHTML = "";
+
+
+    STAT_NAMES.forEach(
+        stat => {
+
+            const unlocked =
+                isStatUnlocked(stat);
+
+            const level =
+                getStatLevel(stat);
+
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "card stat-card " +
+                (
+                    unlocked
+                        ? ""
+                        : "locked"
+                );
+
+
+            if(!unlocked){
+
+                card.innerHTML = `
+
+                    <div class="stat-name">
+                        ???
+                    </div>
+
+                    <div class="stat-level">
+                        LOCKED
+                    </div>
+
+                    <p
+                        style="
+                        color:#555;
+                        font-size:12px;
+                        "
+                    >
+                        Progress more to unlock
+                    </p>
+
+                `;
+
+            }
+
+            else{
+
+                const xp =
+                    getStatXP(stat);
+
+                const required =
+                    statXPRequired(level);
+
+                const progress =
+                    level >= 1000
+                        ? 100
+                        : (
+                            required > 0
+                                ? xp / required * 100
+                                : 0
+                        );
+
+
+                card.innerHTML = `
+
+                    <div class="stat-name">
+                        ${escapeHTML(stat)}
+                    </div>
+
+                    <div class="stat-level">
+                        ${level} / 1000
+                    </div>
+
+                    <div class="progress-track">
+
+                        <div
+                            class="progress-fill"
+                            style="
+                            width:${Math.min(
+                                100,
+                                progress
+                            )}%;
+                            "
+                        ></div>
+
+                    </div>
+
+                    <p
+                        style="
+                        color:#555;
+                        font-size:11px;
+                        margin-top:8px;
+                        "
+                    >
+                        ${
+                            level >= 1000
+                                ? "MAX"
+                                :
+                                xp +
+                                " / " +
+                                required +
+                                " XP"
+                        }
+                    </p>
+
+                `;
+
+            }
+
+
+            container.appendChild(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   RANK PAGE
+========================================================= */
+
+function renderRanks(){
+
+    const container =
+        document.getElementById(
+            "rankList"
+        );
+
+    container.innerHTML = "";
+
+
+    const currentIndex =
+        getRankIndex();
+
+
+    RANKS.forEach(
+        (rank,index) => {
+
+            const unlocked =
+                state.xp >= rank.xp;
+
+            const current =
+                index === currentIndex;
+
+
+            const nextRank =
+                RANKS[index + 1];
+
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "card rank-card " +
+                (
+                    current
+                        ? "current"
+                        : ""
+                );
+
+
+            card.innerHTML = `
+
+                <div class="rank-number">
+                    RANK ${index + 1}
+                </div>
+
+                <div class="rank-name">
+                    ${rank.name}
+                </div>
+
+                <div class="rank-xp">
+                    ${rank.xp.toLocaleString()} XP required
+                </div>
+
+                <div class="rank-status">
+
+                    ${
+                        current
+                            ? `
+                                <span class="badge badge-red">
+                                    CURRENT RANK
+                                </span>
+                            `
+                            :
+                        unlocked
+                            ? `
+                                <span class="badge">
+                                    UNLOCKED
+                                </span>
+                            `
+                            : `
+                                <span class="badge">
+                                    LOCKED
+                                </span>
+                            `
+                    }
+
+                </div>
+
+                ${
+                    nextRank && current
+                        ? `
+                            <div
+                                style="
+                                margin-top:15px;
+                                "
+                            >
+
+                                <div
+                                    style="
+                                    display:flex;
+                                    justify-content:space-between;
+                                    color:#555;
+                                    font-size:10px;
+                                    margin-bottom:6px;
+                                    "
+                                >
+
+                                    <span>
+                                        NEXT RANK
+                                    </span>
+
+                                    <span>
+                                        ${Math.max(
+                                            0,
+                                            nextRank.xp -
+                                            state.xp
+                                        )} XP LEFT
+                                    </span>
+
+                                </div>
+
+                                <div class="progress-track">
+
+                                    <div
+                                        class="progress-fill"
+                                        style="
+                                        width:${
+                                            (
+                                                (
+                                                    state.xp -
+                                                    rank.xp
+                                                ) /
+                                                (
+                                                    nextRank.xp -
+                                                    rank.xp
+                                                )
+                                            ) * 100
+                                        }%"
+                                    ></div>
+
+                                </div>
+
+                            </div>
+                        `
+                        : ""
+                }
+
+            `;
+
+
+            container.appendChild(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   ACHIEVEMENTS
+========================================================= */
+
+function renderAchievements(){
+
+    const container =
+        document.getElementById(
+            "achievementList"
+        );
+
+    container.innerHTML = "";
+
+
+    document.getElementById(
+        "achievementProgress"
+    ).textContent =
+        state.unlockedAchievements.length +
+        " / " +
+        ACHIEVEMENTS.length;
+
+
+    ACHIEVEMENTS.forEach(
+        achievement => {
+
+            const unlocked =
+                state.unlockedAchievements
+                    .includes(
+                        achievement.id
+                    );
+
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "card achievement " +
+                (
+                    !unlocked
+                        ? "hidden-achievement"
+                        : ""
+                );
+
+
+            if(unlocked){
+
+                card.innerHTML = `
+
+                    <div class="achievement-icon">
+                        ★
+                    </div>
+
+                    <div class="achievement-title">
+                        ${escapeHTML(
+                            achievement.name
+                        )}
+                    </div>
+
+                    <div class="achievement-description">
+                        ${escapeHTML(
+                            achievement.description
+                        )}
+                    </div>
+
+                    <div class="achievement-meta">
+
+                        ${achievement.category}
+                        •
+                        ${achievement.rarity}
+                        •
+                        +${achievement.xp} XP
+
+                    </div>
+
+                `;
+
+            }
+
+            else{
+
+                card.innerHTML = `
+
+                    <div class="achievement-icon">
+                        ?
+                    </div>
+
+                    <div class="achievement-title">
+                        ???
+                    </div>
+
+                    <div class="achievement-description">
+                        Hidden achievement.
+                    </div>
+
+                    <div class="achievement-meta">
+                        DISCOVER IT
+                    </div>
+
+                `;
+
+            }
+
+
+            container.appendChild(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   ACHIEVEMENT CHECKING
+========================================================= */
+
+function unlockAchievement(id){
+
+    if(
+        state.unlockedAchievements
+            .includes(id)
+    ){
+
+        return;
+
+    }
+
+
+    const achievement =
+        ACHIEVEMENTS.find(
+            a => a.id === id
+        );
+
+
+    if(!achievement){
+
+        return;
+
+    }
+
+
+    state.unlockedAchievements.push(
+        id
+    );
+
+
+    if(achievement.xp > 0){
+
+        state.xp +=
+            achievement.xp;
+
+        state.level =
+            getLevelFromXP(
+                state.xp
+            );
+
+    }
+
+
+    saveState();
+
+    showToast(
+        "ACHIEVEMENT UNLOCKED — " +
+        achievement.name
+    );
+
+}
+
+
+function checkAchievements(){
+
+    const totalQuests =
+        countCompletedQuests();
+
+
+    if(totalQuests >= 1){
+
+        unlockAchievement(
+            "first-step"
+        );
+
+    }
+
+
+    if(
+        state.xp >= 500
+    ){
+
+        unlockAchievement(
+            "silver"
+        );
+
+    }
+
+
+    if(
+        state.xp >= 2200
+    ){
+
+        unlockAchievement(
+            "gold"
+        );
+
+    }
+
+
+    if(
+        state.xp >= 5500
+    ){
+
+        unlockAchievement(
+            "diamond"
+        );
+
+    }
+
+
+    if(
+        state.xp >= 11000
+    ){
+
+        unlockAchievement(
+            "legend"
+        );
+
+    }
+
+
+    if(
+        state.xp >= 20000
+    ){
+
+        unlockAchievement(
+            "master"
+        );
+
+    }
+
+
+    if(
+        isStatUnlocked("Focus")
+    ){
+
+        unlockAchievement(
+            "focus"
+        );
+
+    }
+
+
+    if(
+        getStatLevel("Discipline") >= 10
+    ){
+
+        unlockAchievement(
+            "discipline"
+        );
+
+    }
+
+
+    const gymCount =
+        countQuestMatches(
+            "gym"
+        );
+
+    if(gymCount >= 25){
+
+        unlockAchievement(
+            "gym-rat"
+        );
+
+    }
+
+    if(gymCount >= 100){
+
+        unlockAchievement(
+            "body-builder"
+        );
+
+    }
+
+
+    const studyCount =
+        countQuestMatches(
+            "study"
+        );
+
+    if(studyCount >= 25){
+
+        unlockAchievement(
+            "study-grind"
+        );
+
+    }
+
+
+    if(
+        state.defeatedBosses.length >= 1
+    ){
+
+        unlockAchievement(
+            "first-boss"
+        );
+
+    }
+
+
+    checkFinalMastery();
+
+}
+
+
+/* =========================================================
+   FINAL MASTERY
+========================================================= */
+
+function checkFinalMastery(){
+
+    const allAchievements =
+        state.unlockedAchievements.length >=
+        ACHIEVEMENTS.length - 1;
+
+
+    const masterComplete =
+        state.xp >= 20000;
+
+
+    const allStatsMax =
+        STAT_NAMES.every(
+            stat =>
+                isStatUnlocked(stat) &&
+                getStatLevel(stat) >= 1000
+        );
+
+
+    if(
+        allAchievements &&
+        masterComplete &&
+        allStatsMax
+    ){
+
+        state.finalUnlocked = true;
+
+        if(
+            !state.unlockedAchievements
+                .includes("total-mastery")
+        ){
+
+            unlockAchievement(
+                "total-mastery"
+            );
+
+        }
+
+        saveState();
+
+    }
+
+}
+
+
+/* =========================================================
+   BOSSES
+========================================================= */
+
+function renderBosses(){
+
+    const container =
+        document.getElementById(
+            "bossList"
+        );
+
+    container.innerHTML = "";
+
+
+    BOSSES.forEach(
+        (boss,index) => {
+
+            const rankIndex =
+                RANKS.findIndex(
+                    r =>
+                        r.name ===
+                        boss.rank
+                );
+
+
+            const unlocked =
+                getRankIndex() >=
+                rankIndex;
+
+
+            const defeated =
+                state.defeatedBosses
+                    .includes(
+                        index
+                    );
+
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "card boss-card";
+
+
+            card.innerHTML = `
+
+                <div
+                    style="
+                    color:#555;
+                    font-size:10px;
+                    letter-spacing:2px;
+                    "
+                >
+                    ${boss.rank} BOSS
+                </div>
+
+                <div class="boss-name">
+                    ${boss.name}
+                </div>
+
+                <div class="boss-phase">
+                    ${
+                        defeated
+                            ? "DEFEATED"
+                            :
+                        unlocked
+                            ? "ACTIVE"
+                            : "LOCKED"
+                    }
+                </div>
+
+                <div class="boss-hp">
+
+                    <div
+                        style="
+                        display:flex;
+                        justify-content:space-between;
+                        font-size:11px;
+                        color:#666;
+                        margin-bottom:7px;
+                        "
+                    >
+
+                        <span>
+                            BOSS HP
+                        </span>
+
+                        <span>
+                            ${
+                                defeated
+                                    ? "0"
+                                    : boss.hp
+                            }
+                            / ${boss.hp}
+                        </span>
+
+                    </div>
+
+                    <div class="progress-track">
+
+                        <div
+                            class="progress-fill"
+                            style="
+                            width:${
+                                defeated
+                                    ? 0
+                                    : 100
+                            }%;
+                            "
+                        ></div>
+
+                    </div>
+
+                </div>
+
+                <div
+                    style="
+                    margin-top:18px;
+                    "
+                >
+
+                    ${
+                        defeated
+                            ? `
+                                <span class="badge">
+                                    DEFEATED
+                                </span>
+                            `
+                            :
+                        unlocked
+                            ? `
+                                <button
+                                    class="btn btn-primary"
+                                    onclick="defeatBoss(${index})"
+                                >
+                                    Complete Boss
+                                </button>
+                            `
+                            : `
+                                <span class="badge">
+                                    LOCKED
+                                </span>
+                            `
+                    }
+
+                </div>
+
+            `;
+
+
+            container.appendChild(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+function defeatBoss(index){
+
+    const boss =
+        BOSSES[index];
+
+
+    if(
+        !boss ||
+        state.defeatedBosses
+            .includes(index)
+    ){
+
+        return;
+
+    }
+
+
+    const rankIndex =
+        RANKS.findIndex(
+            r =>
+                r.name ===
+                boss.rank
+        );
+
+
+    if(
+        getRankIndex() <
+        rankIndex
+    ){
+
+        return;
+
+    }
+
+
+    state.defeatedBosses.push(
+        index
+    );
+
+
+    addXP(
+        boss.reward
+    );
+
+
+    saveState();
+
+    checkAchievements();
+
+    renderAll();
+
+    showToast(
+        "BOSS DEFEATED — +" +
+        boss.reward +
+        " XP"
+    );
+
+}
+
+
+/* =========================================================
+   SCHOOL ROUTINE
+========================================================= */
+
+function renderSchool(){
+
+    const statusCard =
+        document.getElementById(
+            "schoolStatusCard"
+        );
+
+    const status =
+        document.getElementById(
+            "schoolStatus"
+        );
+
+    const statusText =
+        document.getElementById(
+            "schoolStatusText"
+        );
+
+    const countdown =
+        document.getElementById(
+            "schoolCountdown"
+        );
+
+
+    if(isWeekend()){
+
+        statusCard.classList.remove(
+            "routine-online"
+        );
+
+        statusCard.classList.add(
+            "routine-offline"
+        );
+
+        status.className =
+            "status-offline";
+
+        status.textContent =
+            "SCHOOL ROUTINE OFFLINE";
+
+        statusText.textContent =
+            "Enjoy your weekend. School routine returns Monday.";
+
+        updateMondayCountdown();
+
+        document.getElementById(
+            "schoolRoutineList"
+        ).innerHTML = `
+
+            <div class="card">
+
+                <h3>
+                    Weekend Mode
+                </h3>
+
+                <p
+                    style="
+                    color:#666;
+                    margin-top:8px;
+                    "
+                >
+                    Your weekday school routine is offline.
+                    Complete your weekend quests, chores,
+                    revision and enjoy your weekend.
+                </p>
+
+                <div
+                    style="
+                    margin-top:20px;
+                    color:#ffad3d;
+                    font-size:12px;
+                    "
+                >
+                    Next school routine:
+                </div>
+
+                <div
+                    class="countdown"
+                    id="weekendCountdown"
+                >
+                    --
+                </div>
+
+            </div>
+
+        `;
+
+        updateWeekendCountdown();
+
+        return;
+
+    }
+
+
+    statusCard.classList.remove(
+        "routine-offline"
+    );
+
+    statusCard.classList.add(
+        "routine-online"
+    );
+
+    status.className =
+        "status-online";
+
+    status.textContent =
+        "SCHOOL ROUTINE ONLINE";
+
+    statusText.textContent =
+        "Monday-Friday routine active.";
+
+    countdown.textContent =
+        "";
+
+
+    renderQuestList(
+        "schoolRoutineList",
+        SCHOOL_ROUTINE,
+        state.schoolCompleted,
+        "school"
+    );
+
+}
+
+
+function getNextMonday(){
+
+    const now =
+        new Date();
+
+    const date =
+        new Date(now);
+
+    const day =
+        date.getDay();
+
+    let daysUntilMonday;
+
+    if(day === 0){
+
+        daysUntilMonday = 1;
+
+    }
+
+    else{
+
+        daysUntilMonday =
+            8 - day;
+
+    }
+
+
+    date.setDate(
+        date.getDate() +
+        daysUntilMonday
+    );
+
+    date.setHours(
+        7,
+        0,
+        0,
+        0
+    );
+
+    return date;
+
+}
+
+
+function formatCountdown(ms){
+
+    if(ms <= 0){
+
+        return "00:00:00";
+
+    }
+
+
+    const totalSeconds =
+        Math.floor(
+            ms / 1000
+        );
+
+
+    const days =
+        Math.floor(
+            totalSeconds /
+            86400
+        );
+
+    const hours =
+        Math.floor(
+            (
+                totalSeconds %
+                86400
+            ) / 3600
+        );
+
+    const minutes =
+        Math.floor(
+            (
+                totalSeconds %
+                3600
+            ) / 60
+        );
+
+    const seconds =
+        totalSeconds %
+        60;
+
+
+    return (
+        String(days).padStart(2,"0") +
+        ":" +
+        String(hours).padStart(2,"0") +
+        ":" +
+        String(minutes).padStart(2,"0") +
+        ":" +
+        String(seconds).padStart(2,"0")
+    );
+
+}
+
+
+function updateWeekendCountdown(){
+
+    const element =
+        document.getElementById(
+            "weekendCountdown"
+        );
+
+    if(!element){
+
+        return;
+
+    }
+
+
+    const target =
+        getNextMonday();
+
+
+    const update =
+        () => {
+
+            element.textContent =
+                formatCountdown(
+                    target.getTime() -
+                    Date.now()
+                );
+
+        };
+
+
+    update();
+
+}
+
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+function renderDashboard(){
+
+    document.getElementById(
+        "dashboardGreeting"
+    ).textContent =
+        "Welcome, " +
+        state.username +
+        ".";
+
+
+    document.getElementById(
+        "dashboardLevel"
+    ).textContent =
+        state.level;
+
+
+    document.getElementById(
+        "dashboardRank"
+    ).textContent =
+        getCurrentRank().name;
+
+
+    document.getElementById(
+        "dashboardTotalXP"
+    ).textContent =
+        state.xp.toLocaleString();
+
+
+    document.getElementById(
+        "dashboardAchievements"
+    ).textContent =
+        state.unlockedAchievements.length;
+
+
+    const levelStart =
+        xpForLevel(
+            state.level
+        );
+
+    const nextLevel =
+        xpForLevel(
+            state.level + 1
+        );
+
+
+    const percentage =
+        state.level >= 1000
+            ? 100
+            :
+            (
+                (
+                    state.xp -
+                    levelStart
+                ) /
+                (
+                    nextLevel -
+                    levelStart
+                )
+            ) * 100;
+
+
+    document.getElementById(
+        "dashboardXPBar"
+    ).style.width =
+        Math.min(
+            100,
+            Math.max(
+                0,
+                percentage
+            )
+        ) +
+        "%";
+
+
+    document.getElementById(
+        "dashboardXPText"
+    ).textContent =
+        state.xp.toLocaleString() +
+        " XP";
+
+
+    const completed =
+        Object.values(
+            state.dailyCompleted
+        ).filter(Boolean).length;
+
+
+    document.getElementById(
+        "dashboardDaily"
+    ).innerHTML = `
+
+        <div
+            style="
+            display:flex;
+            justify-content:space-between;
+            color:#777;
+            font-size:12px;
+            margin-bottom:8px;
+            "
+        >
+
+            <span>
+                ${completed} /
+                ${DAILY_QUESTS.length}
+                completed
+            </span>
+
+            <span>
+                ${Math.round(
+                    (
+                        completed /
+                        DAILY_QUESTS.length
+                    ) * 100
+                )}%
+            </span>
+
+        </div>
+
+        <div class="progress-track">
+
+            <div
+                class="progress-fill"
+                style="
+                width:${
+                    (
+                        completed /
+                        DAILY_QUESTS.length
+                    ) * 100
+                }%;
+                "
+            ></div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+function renderProfile(){
+
+    document.getElementById(
+        "usernameInput"
+    ).value =
+        state.username;
+
+
+    document.getElementById(
+        "finalMessage"
+    ).textContent =
+        "now you are the person you were always ment to become, I am proud of you, " +
+        state.username;
+
+}
+
+
+function saveUsername(){
+
+    const input =
+        document.getElementById(
+            "usernameInput"
+        );
+
+    const name =
+        input.value.trim();
+
+
+    if(!name){
+
+        showToast(
+            "Enter a name."
+        );
+
+        return;
+
+    }
+
+
+    state.username =
+        name;
+
+
+    saveState();
+
+    renderAll();
+
+    showToast(
+        "Profile updated."
+    );
+
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+function resetGame(){
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to reset ALL LIFE RPG progress?"
+        );
+
+
+    if(!confirmed){
+
+        return;
+
+    }
+
+
+    state =
+        structuredClone(
+            DEFAULT_STATE
+        );
+
+
+    saveState();
+
+    renderAll();
+
+    showToast(
+        "Progress reset."
+    );
+
+}
+
+
+/* =========================================================
+   PAGE NAVIGATION
+========================================================= */
+
+function showPage(page){
+
+    document
+        .querySelectorAll(
+            ".page"
+        )
+        .forEach(
+            element => {
+
+                element.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+
+    const target =
+        document.getElementById(
+            "page-" + page
+        );
+
+
+    if(target){
+
+        target.classList.add(
+            "active"
+        );
+
+    }
+
+
+    document
+        .querySelectorAll(
+            ".nav-button"
+        )
+        .forEach(
+            button => {
+
+                button.classList.toggle(
+                    "active",
+                    button.dataset.page === page
+                );
+
+            }
+        );
+
+
+    document
+        .getElementById(
+            "sidebar"
+        )
+        .classList.remove(
+            "mobile-open"
+        );
+
+
+    window.scrollTo(
+        0,
+        0
+    );
+
+
+    if(
+        page === "character"
+    ){
+
+        renderCharacter();
+
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE MENU
+========================================================= */
+
+function toggleMobileMenu(){
+
+    document
+        .getElementById(
+            "sidebar"
+        )
+        .classList.toggle(
+            "mobile-open"
+        );
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+function showToast(message){
+
+    const container =
+        document.getElementById(
+            "toast-container"
+        );
+
+
+    const toast =
+        document.createElement(
+            "div"
+        );
+
+
+    toast.className =
+        "toast";
+
+
+    toast.textContent =
+        message;
+
+
+    container.appendChild(
+        toast
+    );
+
+
+    setTimeout(
+        () => {
+
+            toast.remove();
+
+        },
+        3000
+    );
+
+}
+
+
+/* =========================================================
+   COUNTERS
+========================================================= */
+
+function countCompletedQuests(){
+
+    let total = 0;
+
+
+    total +=
+        Object.values(
+            state.dailyCompleted
+        ).filter(Boolean).length;
+
+
+    total +=
+        Object.values(
+            state.weeklyCompleted
+        ).filter(Boolean).length;
+
+
+    total +=
+        Object.values(
+            state.monthlyCompleted
+        ).filter(Boolean).length;
+
+
+    total +=
+        Object.values(
+            state.schoolCompleted
+        ).filter(Boolean).length;
+
+
+    total +=
+        state.customQuests.filter(
+            q => q.completed
+        ).length;
+
+
+    return total;
+
+}
+
+
+function countQuestMatches(
+    text
+){
+
+    let count = 0;
+
+
+    const collections = [
+
+        state.dailyCompleted,
+
+        state.weeklyCompleted,
+
+        state.monthlyCompleted,
+
+        state.schoolCompleted
+
+    ];
+
+
+    collections.forEach(
+        collection => {
+
+            Object.keys(
+                collection
+            ).forEach(
+                id => {
+
+                    if(
+                        collection[id] &&
+                        id
+                            .toLowerCase()
+                            .includes(
+                                text
+                                    .toLowerCase()
+                            )
+                    ){
+
+                        count++;
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+    state.customQuests.forEach(
+        quest => {
+
+            if(
+                quest.completed &&
+                (
+                    quest.name +
+                    " " +
+                    quest.description
+                )
+                    .toLowerCase()
+                    .includes(
+                        text.toLowerCase()
+                    )
+            ){
+
+                count++;
+
+            }
+
+        }
+    );
+
+
+    return count;
+
+}
+
+
+/* =========================================================
+   HTML ESCAPE
+========================================================= */
+
+function escapeHTML(
+    value
+){
+
+    return String(value)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================================
+   ALL RENDERING
+========================================================= */
+
+function renderAll(){
+
+    handleResets();
+
+    renderDashboard();
+
+    renderCharacter();
+
+    renderQuestList(
+        "dailyQuestList",
+        DAILY_QUESTS,
+        state.dailyCompleted,
+        "daily"
+    );
+
+    renderQuestList(
+        "weeklyQuestList",
+        WEEKLY_QUESTS,
+        state.weeklyCompleted,
+        "weekly"
+    );
+
+    renderQuestList(
+        "monthlyQuestList",
+        MONTHLY_QUESTS,
+        state.monthlyCompleted,
+        "monthly"
+    );
+
+    renderCustomQuests();
+
+    renderRanks();
+
+    renderStats();
+
+    renderAchievements();
+
+    renderBosses();
+
+    renderSchool();
+
+    renderProfile();
+
+}
+
+
+/* =========================================================
+   INTRO PARTICLES
+========================================================= */
+
+function createIntroParticles(){
+
+    const container =
+        document.getElementById(
+            "introParticles"
+        );
+
+
+    for(
+        let i = 0;
+        i < 55;
+        i++
+    ){
+
+        const particle =
+            document.createElement(
+                "div"
+            );
+
+
+        particle.className =
+            "intro-particle";
+
+
+        const angle =
+            Math.random() *
+            Math.PI *
+            2;
+
+
+        const distance =
+            250 +
+            Math.random() *
+            600;
+
+
+        const x =
+            Math.cos(angle) *
+            distance;
+
+
+        const y =
+            Math.sin(angle) *
+            distance;
+
+
+        const rotation =
+            angle *
+            180 /
+            Math.PI;
+
+
+        particle.style.setProperty(
+            "--x",
+            x + "px"
+        );
+
+
+        particle.style.setProperty(
+            "--y",
+            y + "px"
+        );
+
+
+        particle.style.setProperty(
+            "--r",
+            rotation + "deg"
+        );
+
+
+        particle.style.left =
+            "50%";
+
+
+        particle.style.top =
+            "50%";
+
+
+        particle.style.animationDelay =
+            (
+                Math.random() *
+                1.7
+            ) +
+            "s";
+
+
+        container.appendChild(
+            particle
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   INTRO
+========================================================= */
+
+function startIntro(){
+
+    createIntroParticles();
+
+
+    const intro =
+        document.getElementById(
+            "intro"
+        );
+
+
+    const app =
+        document.getElementById(
+            "app"
+        );
+
+
+    setTimeout(
+        () => {
+
+            intro.classList.add(
+                "intro-hide"
+            );
+
+            app.classList.add(
+                "active"
+            );
+
+        },
+        5100
+    );
+
+
+    setTimeout(
+        () => {
+
+            intro.style.display =
+                "none";
+
+        },
+        6000
+    );
+
+}
+
+
+/* =========================================================
+   PWA
+========================================================= */
+
+if(
+    "serviceWorker" in navigator
+){
+
+    window.addEventListener(
+        "load",
+        () => {
+
+            navigator.serviceWorker
+                .register(
+                    "./sw.js"
+                )
+                .catch(
+                    error => {
+
+                        console.error(
+                            "Service worker registration failed:",
+                            error
+                        );
+
+                    }
+                );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   WEEKEND COUNTDOWN LOOP
+========================================================= */
+
+setInterval(
+    () => {
+
+        if(isWeekend()){
+
+            updateWeekendCountdown();
+
+        }
+
+    },
+    1000
+);
+
+
+/* =========================================================
+   INITIALISE
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        handleResets();
+
+        renderAll();
+
+        startIntro();
+
+    }
+);
+
+</script>
+
+</body>
+</html>
